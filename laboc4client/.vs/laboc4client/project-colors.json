@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "a0b21694-07d8-4284-bb8b-da1d3201db27": {
+      "ProjectGuid": "a0b21694-07d8-4284-bb8b-da1d3201db27",
+      "DisplayName": "laboc4client",
+      "ColorIndex": 0
+    },
+    "ecd7ef22-3e0d-4d1f-882d-d62e54e2e201": {
+      "ProjectGuid": "ecd7ef22-3e0d-4d1f-882d-d62e54e2e201",
+      "DisplayName": "ConsoleApplication1",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}

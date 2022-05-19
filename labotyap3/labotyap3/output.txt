@@ -1,0 +1,2 @@
+if[if] a[id] <[co] 5[vl] then[th] b[id] =[eq] 3[vl] /[ao] 5[vl] -[ao] 7[vl] *[ao] 3[vl] 
+14 ao el en sc

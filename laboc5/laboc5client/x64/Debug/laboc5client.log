@@ -1,0 +1,3 @@
+﻿  laboc5client.cpp
+C:\Users\karin\source\repos\laboc5\laboc5client\laboc5client.cpp(60,35): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  laboc5client.vcxproj -> C:\Users\karin\source\repos\laboc5\x64\Debug\laboc5client.exe

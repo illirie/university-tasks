@@ -1,0 +1,3 @@
+﻿  laboc4.cpp
+C:\Users\karin\source\repos\laboc4\laboc4\laboc4.cpp(72,84): warning C4312: приведение типов: преобразование из "int" в "LPVOID" большего размера
+  laboc4.vcxproj -> C:\Users\karin\source\repos\laboc4\x64\Debug\laboc4.exe

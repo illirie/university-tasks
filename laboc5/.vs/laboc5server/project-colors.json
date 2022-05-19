@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "c5a1794d-fdd4-423b-b14d-ed48897a0d18": {
+      "ProjectGuid": "c5a1794d-fdd4-423b-b14d-ed48897a0d18",
+      "DisplayName": "laboc5",
+      "ColorIndex": 0
+    },
+    "b69f5927-f3c5-4f1a-84b9-bf132d688297": {
+      "ProjectGuid": "b69f5927-f3c5-4f1a-84b9-bf132d688297",
+      "DisplayName": "laboc5client",
+      "ColorIndex": 1
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Прочие файлы",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 2
+}
