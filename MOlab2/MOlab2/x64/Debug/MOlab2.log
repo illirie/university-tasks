@@ -14,7 +14,7 @@ C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\matrix_utils.h(261,26
 C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\matrix_utils.h(320,18): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
 C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\matrix_utils.h(322,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
 C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(94,40): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(224,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(225,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(240,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(231,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(232,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\karin\source\repos\university-tasks\MOlab2\MOlab2\MOlab2.cpp(252,1): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
   MOlab2.vcxproj -> C:\Users\karin\source\repos\university-tasks\MOlab2\x64\Debug\MOlab2.exe

@@ -160,6 +160,13 @@ vec_n conjugateGradDescend(func_nd f, vec_n x) {
     return (xi_1 + x) * 0.5;
 }
 
+double penalty_extr(const mat_mn& bounds, const vec_n& b, const vec_n& x)
+{
+    double res = 0.0;
+    for (const auto& value : bounds * x - b) res += value <= 0.0 ? 0.0 : pow(value, 2);
+    return res;
+}
+
 vec_n newtoneRaphson(func_nd f, vec_n x)
 {
     vec_n x1, grad;
@@ -220,11 +227,16 @@ private:
     int m = 0, n = 0; //размеры таблицы
     bool isMin;
 public:
-    simplex(mat_mn source, bool cond) {
+    simplex(mat_mn& source, const  bool& cond, const vec_n& ineq) {
         m = source.size();
         n = source[0].size();
         table = zeros(m, m + n - 1);
         isMin = cond;
+        if (isMin) {
+            for (int i = 0; i < n; i++) {
+                source[m - 1][i] *= -1;
+            }
+        }
         for (int i = 0; i < m; i++)
         {
             for (int j = 0; j < table[0].size(); j++)
@@ -233,47 +245,47 @@ public:
             }
             if ((n + i) < table[0].size())
             {
-                table[i][n + i] = 1;
+                table[i][n + i] = ineq[i] * -1;
                 basis.push_back(n + i);
             }
         }
         n = table[0].size();
+        std::cout << '\n';
+        this->printBasis();
+        this->printTable();
+        std::cout << '\n';
     };
-    bool ending_cond() {
+    bool endingCond() {
         bool flag = true;
         for (int j = 1; j < n; j++)
         {
-            if (isMin) {
-                if (table[m - 1][j] > 0)
-                {
-                    flag = false;
-                    break;
-                }
-            }
-            else {
                 if (table[m - 1][j] < 0)
                 {
                     flag = false;
                     break;
                 }
-            }
         }
         return flag;
     }
     int findMainCol() {
-        int mainCol = 1;
+        int mainCol = 1, flag = -1;
         for (int j = 2; j < n; j++) {
             if (table[m - 1][j] < table[m - 1][mainCol]) {
                 mainCol = j;
+                flag = 1;
             }
         }
-        return mainCol;
+        if (flag == 1 || table[m-1][mainCol] < 0) {
+            return mainCol;
+        }
+        return flag;
     }
     int findMainRow(int mainCol) {
         int mainRow = 0;
         for (int i = 0; i < m - 1; i++) {
             if (table[i][mainCol] > 0) {
                 mainRow = i;
+                //std::cout << mainRow << '\n';
                 break;
             }
         }
@@ -286,13 +298,17 @@ public:
     }
     vec_n solve(int x_num) {
         int mainCol, mainRow; //ведущие столбец и строка
-        while (!ending_cond())
+        while (!endingCond())
         {
             mainCol = findMainCol();
+            if (mainCol == -1) {
+                std::cout << "Error" << '\n';
+                break;
+            }
             mainRow = findMainRow(mainCol);
             basis[mainRow] = mainCol;
             mat_mn new_table = zeros(m, n);
-
+            std::cout << "mainCol: " << mainCol << " mainRow: " << mainRow << '\n';
             for (int j = 0; j < n; j++) {
                 new_table[mainRow][j] = table[mainRow][j] / table[mainRow][mainCol];
             }
@@ -305,6 +321,9 @@ public:
                 }
             }
             table = new_table;
+            this->printBasis();
+            this->printTable();
+            std::cout << '\n';
         }
         vec_n result;
         //заносим в result найденные значения X
@@ -326,6 +345,14 @@ public:
         }
         return result;
     }
+    void printTable() {
+        for (auto a : table) {
+            std::cout << a << '\n';
+        }
+    }
+    void printBasis() {
+        std::cout << "Basis: " << basis << '\n';
+    }
 };
 
 int main()
@@ -345,12 +372,27 @@ int main()
     penalty_coef = 2;
     delta_pen = 0.5;
     std::cout << "external penalty  : " << newtoneRaphson_with_penalty(external_penalty2, x0) << '\n';
-    mat_mn sourse = { {25, -3,  5},
+    mat_mn source = { {25, -3,  5},
                       {30, -2,  5},
                       {10,  1,  0},
                       { 6,  3, -8},
                       { 0, -6, -5} };
-    simplex s(sourse, false);
+    vec_n i = { -1, -1, -1, -1 };
+    simplex s(source, false, i);
     std::cout << "simplex           : " << s.solve(2) << '\n';
+    source = { {240, 2, 3, 6},
+               {200, 4, 2, 4},
+               {160, 4, 6, 8},
+               {0, -4, -5, -4} }; 
+    i = { -1, -1, -1 };
+    simplex s1(source, false, i);
+    std::cout << "simplex           : " << s1.solve(3) << '\n';
+    // mat_mn source = { {40, -2, 6},
+    //            {28, 3, 2},
+    //            {14, 2, -1},
+    //            {0, -2, -3} };
+    // vec_n i = { -1, -1, -1 };
+    // simplex s2(source, false, i);
+    // std::cout << "simplex           : " << s2.solve(2) << '\n';
     return 0;
 }
