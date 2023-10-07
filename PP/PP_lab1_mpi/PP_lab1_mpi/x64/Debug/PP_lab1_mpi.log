@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\karin\source\repos\university-tasks\PP\PP_lab1_mpi\PP_lab1_mpi\main.cpp(6,22): warning C4101: i: неиспользованная локальная переменная
+  PP_lab1_mpi.vcxproj -> C:\Users\karin\source\repos\university-tasks\PP\PP_lab1_mpi\x64\Debug\PP_lab1_mpi.exe
