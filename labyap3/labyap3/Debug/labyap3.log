@@ -1,5 +1,0 @@
-﻿  labyap3.cpp
-C:\Users\karin\source\repos\labyap3\labyap3\labyap3.cpp(23,23): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
-C:\Users\karin\source\repos\labyap3\labyap3\labyap3.cpp(31,24): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
-C:\Users\karin\source\repos\labyap3\labyap3\labyap3.cpp(36,15): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
-  labyap3.vcxproj -> C:\Users\karin\source\repos\labyap3\Debug\labyap3.exe

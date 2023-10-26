@@ -1,4 +1,0 @@
-﻿  labotayp1.cpp
-C:\Users\karin\source\repos\labotayp1\labotayp1\labotayp1.cpp(98,22): warning C4244: =: преобразование "std::streamoff" в "int", возможна потеря данных
-C:\Users\karin\source\repos\labotayp1\labotayp1\labotayp1.cpp(103,27): warning C4018: <: несоответствие типов со знаком и без знака
-  labotayp1.vcxproj -> C:\Users\karin\source\repos\labotayp1\Debug\labotayp1.exe

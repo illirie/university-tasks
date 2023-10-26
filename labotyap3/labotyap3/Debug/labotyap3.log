@@ -1,7 +1,0 @@
-﻿  labotyap3.cpp
-C:\Users\karin\source\repos\labotyap3\labotyap3\labotyap3.cpp(232,11): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\karin\source\repos\labotyap3\labotyap3\labotyap3.cpp(277,16): warning C4244: =: преобразование "std::streamoff" в "int", возможна потеря данных
-C:\Users\karin\source\repos\labotyap3\labotyap3\labotyap3.cpp(282,21): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\karin\source\repos\labotyap3\labotyap3\labotyap3.cpp(287,21): warning C4018: <: несоответствие типов со знаком и без знака
-C:\Users\karin\source\repos\labotyap3\labotyap3\labotyap3.cpp(44): warning C4715: check2: значение возвращается не при всех путях выполнения
-  labotyap3.vcxproj -> C:\Users\karin\source\repos\labotyap3\Debug\labotyap3.exe
