@@ -5,7 +5,7 @@ m = 1000;
 p = 0;
 q = 5;
 a = 0;
-b = 10;
+b = 5;
 hx = (b-a)/n;
 x = a:hx:(b-hx/2);
 hxi = (q-p)/m;
@@ -14,7 +14,7 @@ xi = p:hxi:(q-hxi/2);
 f = exp(i*beta*x);
 
 alpha = 1;
-J = i*besselj(alpha,X).*XI;
+J = i*besselj(0,alpha*X.*XI).*X;
 F = J*f.'*hx
 
 figure(1)

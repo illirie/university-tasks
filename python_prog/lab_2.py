@@ -52,6 +52,27 @@ class Regression:
         return x, y, x * kx + y * ky + dz 
     
     @staticmethod
+    def second_order_surface_2d(surf_params:
+                                Tuple[float, float, float, float, float, float] = (1.0, -2.0, 3.0, 1.0, 2.0, -3.0),
+                                args_range: float = 1.0, rand_range: float = .1, n_points: int = 1000) -> \
+                                Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Генерирует набор тестовых данных около поверхности второго порядка.
+        Уравнение поверхности:
+        z(x,y) = a * x^2 + x * y * b + c * y^2 + d * x + e * y + f
+        :param surf_params: 
+        :param surf_params [a, b, c, d, e, f]:
+        :param args_range x in [x0, x1], y in [y0, y1]:
+        :param rand_range:
+        :param n_points:
+        :return:
+        """
+        x = np.array([Regression.rand_in_range(args_range) for _ in range(n_points)])
+        y = np.array([Regression.rand_in_range(args_range) for _ in range(n_points)])
+        dz = np.array([surf_params[5] + Regression.rand_in_range(rand_range) for _ in range(n_points)])
+        return x, y, surf_params[0] * x * x + surf_params[1] * y * x + surf_params[2] * y * y + \
+               surf_params[3] * x + surf_params[4] * y + dz
+    @staticmethod
     def test_data_nd(surf_settings: np.ndarray = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 12.0]), args_range: float = 1.0,
                      rand_range: float = 0.1, n_points: int = 125) -> np.ndarray:
         """
@@ -114,7 +135,7 @@ class Regression:
         x_sum = x.sum()
         y_sum = y.sum()
         k = (xy_sum - x_sum * y_sum * one_div_by_n) / (xx_sum - x_sum * x_sum * one_div_by_n)
-        b = (x_sum - k * x_sum) * one_div_by_n
+        b = (y_sum - k * x_sum) * one_div_by_n
         return k, b
 
     @staticmethod
@@ -155,7 +176,6 @@ class Regression:
         H = np.array([[xx_sum, xy_sum, x_sum], [xy_sum, yy_sum, y_sum], [x_sum, y_sum, n]])
         grad = np.array([[-xz_sum + xy_sum + xx_sum], [-yz_sum + yy_sum + xy_sum], [-z_sum + y_sum + x_sum]])
         res = vec - np.dot(np.linalg.inv(H), grad)
-        print(res)
         return res
 
     @staticmethod
@@ -178,22 +198,25 @@ class Regression:
         :param data_rows:  состоит из строк вида: [x_0,x_1,...,x_n, f(x_0,x_1,...,x_n)]
         :return:
         """
-        rows = len(data_rows)
-        H = np.zeros((rows, rows))
-        for i in range(rows):
-            for j in range(rows):
-                if i == rows - 1:
-                    p = sum(data_rows[:][j])
-                    H[i][j] = copy.copy(p)
-                elif j == rows - 1:
-                    p = sum(data_rows[:][i])
-                    H[i][j] = copy.copy(p)
-                else:
-                    p = 0
-                    for k in range(rows):
-                        p+= data_rows[k][i] * data_rows[k][j]
-                    H[i][j] = copy.copy(p)
-        return np.array((0.0,))
+        s_cols = data_rows.shape[1]
+        H = np.zeros((s_cols, s_cols), dtype=float)
+        grad = np.zeros((s_cols), dtype=float)
+        x_0 = np.ones((s_cols), dtype=float)
+        x_0[len(x_0)-1] = 0
+        for row in range(s_cols - 1):
+            for col in range(row + 1):
+                value = np.sum(np.dot(data_rows[:, row], data_rows[:, col]))
+                H[row, col] = value
+                H[col, row] = value
+        for i in range(s_cols):
+            value = np.sum(data_rows[:, i])
+            H[i, s_cols - 1] = value
+            H[s_cols - 1, i] = value
+        H[s_cols - 1, s_cols - 1] = data_rows.shape[0]
+        for row in range(s_cols - 1):
+            grad[row] = np.sum(H[row, 0: s_cols - 1]) - np.dot(data_rows[:, s_cols - 1], data_rows[:, row])
+        grad[s_cols - 1] = np.sum(H[s_cols - 1, 0 : s_cols - 1]) - np.sum(data_rows[:, s_cols - 1])
+        return x_0 - np.dot(np.linalg.inv(H), grad)
 
     @staticmethod
     def poly_regression(x: np.ndarray, y: np.ndarray, order: int = 5) -> np.ndarray:
@@ -208,8 +231,19 @@ class Regression:
         :param order: порядок полинома
         :return: набор коэффициентов bi полинома y = Σx^i*bi
         """
-        coefs = np.polyfit(x, y, order)
-        return coefs
+        a_m = np.zeros((order, order,), dtype=float)
+        c_m = np.zeros((order,), dtype=float)
+        n = x.size
+        x1 = 1
+        for row in range(order):
+            c_m[row] = np.sum(y * (x1)) / n
+            x2 = x1
+            for col in range(row + 1):
+                a_m[row][col] = np.sum(x2) / n
+                a_m[col][row] = a_m[row][col]
+                x2 = x2 * x
+            x1= x1 * x
+        return np.linalg.inv(a_m) @ c_m
 
     @staticmethod
     def polynom(x: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -219,17 +253,27 @@ class Regression:
         :returns: возвращает полином yi = Σxi^j*bj\n
         """
         y = []
-        print(b)
         for i in x:
             p = 0
             for j in range(len(b)):
-                p += b[len(b) - 1 - j] * pow(i, j)
+                p += b[j] * pow(i, j)
             y.append(p)
         return np.array(y)
 
     @staticmethod
     def quadratic_regression_2d(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
-        return np.array((0.0,))
+        params = [x*x, x*y, y*y,  x, y, np.array((1.0, ))]
+        # a_ij = (params_i, params_j)
+        # b_i = (params_i, z)
+        # A^-1*b
+        a = np.zeros((len(params), len(params)), dtype=float)
+        b = np.ones(len(params), dtype=float)
+        for i in range(len(params)):
+            b[i] = (params[i] * z).sum()
+            for j in range(i + 1):
+                a[i][j] = a[j][i] = (params[i] * params[j]).sum()
+        a[-1, -1] = x.size
+        return np.linalg.inv(a) @ b # np.dot(np.linalg.inv(a) @ b)
 
     @staticmethod
     def distance_field_example():
@@ -239,7 +283,7 @@ class Regression:
         2) Задать интересующие нас диапазоны k и b (np.linspace...)\n
         3) Рассчитать поле расстояний (distance_field) и вывести в виде изображения.\n
         4) Проанализировать результат (смысл этой картинки в чём...)\n
-        :return:
+        :return: 
         """
         print("distance field test:")
         x, y = Regression.test_data_along_line()
@@ -269,8 +313,9 @@ class Regression:
         x, y = Regression.test_data_along_line()
         k, b = Regression.linear_regression(x, y)
         print(f"y(x) = {k:1.5} * x + {b:1.5}\n")
-        y_ = k*x + b
-        plt.plot(x, y_)
+        x_ = np.array([0, 1])
+        y_ = k*x_ + b
+        plt.plot(x_, y_, 'r')
         plt.scatter(x, y)
         plt.grid(True)
         plt.show()
@@ -288,7 +333,18 @@ class Regression:
         print('\nbi_linear regression test:')
         from matplotlib import cm
         x, y, z = Regression.test_data_2d()
-        kx, ky, b = Regression.bi_linear_regression(x, y, z)
+        coefs = Regression.bi_linear_regression(x, y, z)
+        print(coefs)
+        # print(f"z(x, y) = {coefs[0]:1.5} * x + {coefs[1]:1.5} * y + {coefs[2]:1.5}")
+        x_, y_ = np.meshgrid(np.linspace(np.min(x), np.max(x), 100), np.linspace(np.min(y), np.max(y), 100))
+        z_ = coefs[0] * x_ + y_ * coefs[1] + coefs[2]
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        ax.plot(x, y, z, 'r.')
+        surf = ax.plot_surface(x_, y_, z_, cmap=cm.coolwarm, linewidth=0, antialiased=False, edgecolor='none', alpha=0.5)
+        plt.xlabel("x")
+        plt.ylabel("y")
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+        plt.show()
 
     @staticmethod
     def poly_reg_example():
@@ -304,8 +360,9 @@ class Regression:
         x, y = Regression.test_data_along_line()
         coefficients = Regression.poly_regression(x, y)
         print(coefficients)
-        y_ = Regression.polynom(x, coefficients)
-        plt.plot(x, y_)
+        x_ = np.arange(0, 1, 0.01)
+        y_ = Regression.polynom(x_, coefficients)
+        plt.plot(x_, y_, 'r')
         plt.scatter(x, y)
         plt.grid(True)
         plt.show()
@@ -313,24 +370,37 @@ class Regression:
     @staticmethod
     def n_linear_reg_example():
         print("\nn linear regression test:")
+        data = Regression.test_data_nd()
+        coeffs = Regression.n_linear_regression(data)
+        print(coeffs)
+
 
     @staticmethod
     def quadratic_reg_example():
         """
         """
         print('2d quadratic regression test:')
-        # x, y, z = Regression.second_order_surface_2d()
-        # coeffs = Regression.quadratic_regression_2d(x, y, z)
-        # y_ = polynom(x, coefficients)
-        # print(
-        #     f"z(x, y) = {coeffs[0]:1.3} * x^2 + {coeffs[1]:1.3} * x * y + {coeffs[2]:1.3} * y^2 + {coeffs[3]:1.3} * x + {coeffs[4]:1.3} * y + {coeffs[5]:1.3}")
+        from matplotlib import cm
+        x, y, z = Regression.second_order_surface_2d()
+        coeffs = Regression.quadratic_regression_2d(x, y, z)
+        print(
+            f"z(x, y) = {coeffs[0]:1.3} * x^2 + {coeffs[1]:1.3} * x * y + {coeffs[2]:1.3} * y^2 + {coeffs[3]:1.3} * x + {coeffs[4]:1.3} * y + {coeffs[5]:1.3}")
+        x_, y_ = np.meshgrid(np.linspace(np.min(x), np.max(x), 100), np.linspace(np.min(y), np.max(y), 100))
+        z_ = coeffs[0]*x_**2 + coeffs[1]*x_*y_ + coeffs[2]*y_**2 + coeffs[3]*x_ + coeffs[4]*y_ + coeffs[5]
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        ax.plot(x, y, z, 'r.')
+        surf = ax.plot_surface(x_, y_, z_, cmap=cm.coolwarm, linewidth=0, antialiased=False, edgecolor='none', alpha=0.5)
+        plt.xlabel("x")
+        plt.ylabel("y")
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+        plt.show()
 
 
 if __name__ == "__main__":
-    Regression.distance_field_example()
-    Regression.linear_reg_example()
-    Regression.bi_linear_reg_example()
-    Regression.n_linear_reg_example()
-    Regression.poly_reg_example()
+    # Regression.distance_field_example()
+    # Regression.linear_reg_example()
+    # Regression.bi_linear_reg_example()
+    # Regression.n_linear_reg_example()
+    # Regression.poly_reg_example()
     Regression.quadratic_reg_example()
 

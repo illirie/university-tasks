@@ -6,10 +6,10 @@
 double a [N];
 
 int main(int argc, char* argv[]) {
-	omp_set_num_threads(15);
-	int i, j, u;
-	double  sum;
-	srand(51);
+	omp_set_num_threads(5);
+	int i, j, q;
+	double  sum, subsum;
+	srand();
 	for (j = 0; j < N; j++)
 	{
 		 a[j] = rand() % 10 + 1;
@@ -17,12 +17,13 @@ int main(int argc, char* argv[]) {
 	double st_time, end_time;
 	st_time = omp_get_wtime();
 	sum = 0;
-	for (u = 0; u < Q; u++) {
-		sum = 0;
-#pragma omp parallel for shared(a) private(i) reduction(+: sum)
+#pragma omp parallel for shared(a) private(i, q, subsum) reduction(+: sum)
 	for (i = 0; i < N; i++) {
-		sum = sum + a[i];
-	}
+		subsum = 0;
+		for (q = 0; q < Q; q++) {
+			subsum += a[i];
+		}
+		sum += subsum / Q;
 	}
 	end_time = omp_get_wtime();
 	end_time = end_time - st_time;
